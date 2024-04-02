@@ -3,7 +3,8 @@ from .forms import UserCreationForm, AuthenticationForm,RatingForm
 from django.contrib.auth import login, authenticate
 from .models import Movie,Rating
 from django.contrib.auth.decorators import login_required
-from .forms import MovieForm
+from .forms import MovieForm,UserUpdateForm, ProfileUpdateForm
+
 
 def register(request):
     if request.method == 'POST':
@@ -16,17 +17,41 @@ def register(request):
         form = UserCreationForm()
     return render(request, 'registration/register.html', {'form': form})
 
+
+
 def user_login(request):
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
-            user = authenticate(username=form.cleaned_data['username'], password=form.cleaned_data['password'])
+            user = authenticate(username=form.cleaned_data['username'],
+                                password=form.cleaned_data['password'],
+                                phoneNumber=form.cleaned_data['phone_number'])
             if user is not None:
                 login(request, user)
                 return redirect('index')
     else:
         form = AuthenticationForm()
     return render(request, 'login.html', {'form': form})
+
+@login_required
+def profile(request):
+    if request.method == 'POST':
+        u_form = UserUpdateForm(request.POST, instance=request.user)
+        p_form = ProfileUpdateForm(request.POST, instance=request.user.profile)
+        if u_form.is_valid() and p_form.is_valid():
+            u_form.save()
+            p_form.save()
+            return redirect('profile')  # Redirect back to the profile page to see the changes
+    else:
+        u_form = UserUpdateForm(instance=request.user)
+        p_form = ProfileUpdateForm(instance=request.user.profile)
+
+    context = {
+        'u_form': u_form,
+        'p_form': p_form
+    }
+
+    return render(request, 'users/profile.html', context)
 
 def movie_list(request):
     movies = Movie.objects.all()
