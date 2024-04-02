@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ movie.title }}</title>
+    <style>
+        /* Add any additional styling here */
+        body { font-family: Arial, sans-serif; }
+        .container { width: 80%; margin: auto; }
+        .movie-detail, .rating-form, .average-rating { margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="movie-detail">
+            <h1>{{ movie.title }}</h1>
+            <p><strong>Description:</strong> {{ movie.description }}</p>
+            <p><strong>Release Date:</strong> {{ movie.release_date }}</p>
+            <!-- Include other movie details as needed -->
+        </div>
+
+        <div class="average-rating">
+            <h2>Average Rating: {{ movie.average_rating|floatformat:1 }}</h2>
+        </div>
+
+        <div class="rating-form">
+            <h2>Rate this movie</h2>
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit">Submit Rating</button>
+            </form>
+        </div>
+
+        <!-- Optionally, include a list of individual ratings and comments, if your model supports this -->
+    </div>
+</body>
+</html>
